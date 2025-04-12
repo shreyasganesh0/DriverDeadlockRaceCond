@@ -47,7 +47,6 @@ int e2_open(struct inode *inode, struct file *filp)
     if (devc->mode == MODE1) {
         devc->count1++;
         up(&devc->sem1);
-        msleep(2000);
         down_interruptible(&devc->sem2);
         return 0;
     }
@@ -154,7 +153,6 @@ static long e2_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
              up(&devc->sem1);
              break;
           }
-          msleep(1000);
           if (devc->count1 > 1) {
              while (devc->count1 > 1) {
                 up(&devc->sem1);

@@ -35,12 +35,10 @@ MODULE_INFO(retpoline, "Y");
 
 static const char ____versions[]
 __used __section("__versions") =
-	"\x10\x00\x00\x00\xf9\x82\xa4\xf9"
-	"msleep\0\0"
 	"\x14\x00\x00\x00\x44\x43\x96\xe2"
 	"__wake_up\0\0\0"
-	"\x10\x00\x00\x00\x7e\x3a\x2c\x12"
-	"_printk\0"
+	"\x20\x00\x00\x00\x5d\x7b\xc1\xe2"
+	"__SCT__might_resched\0\0\0\0"
 	"\x18\x00\x00\x00\x75\x79\x48\xfe"
 	"init_wait_entry\0"
 	"\x14\x00\x00\x00\x51\x0e\x00\x01"
@@ -49,8 +47,8 @@ __used __section("__versions") =
 	"prepare_to_wait_event\0\0\0"
 	"\x14\x00\x00\x00\xbf\x0f\x54\x92"
 	"finish_wait\0"
-	"\x20\x00\x00\x00\x5d\x7b\xc1\xe2"
-	"__SCT__might_resched\0\0\0\0"
+	"\x10\x00\x00\x00\x7e\x3a\x2c\x12"
+	"_printk\0"
 	"\x1c\x00\x00\x00\xcb\xf6\xfd\xf0"
 	"__stack_chk_fail\0\0\0\0"
 	"\x20\x00\x00\x00\x3b\x8f\xd7\x3f"
@@ -106,4 +104,4 @@ __used __section("__versions") =
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "FF068439F20DCFFF90AF532");
+MODULE_INFO(srcversion, "15E58502E0F22DD48CD6423");
