@@ -4,76 +4,85 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <signal.h>
+#include <sys/ioctl.h>
 
-#define DEV_PATH "/dev/a6"
+#define DEV_FILE "/dev/a6"
 #define CDRV_IOC_MAGIC 'Z'
 #define E2_IOCMODE1 _IO(CDRV_IOC_MAGIC, 1)
 #define E2_IOCMODE2 _IO(CDRV_IOC_MAGIC, 2)
 
-void *open_func(void *arg) {
+void *read_thread_func(void *arg) {
+    int fd = *((int*)arg);
+    char buffer[128];
+    ssize_t ret;
 
-    printf("Starting open in %d thread\n", *(int *)arg);
-    int fd = open(DEV_PATH, O_RDWR);
-    printf("Finished open in %d thread\n", *(int *)arg);
-
-    if (fd == -1) {
-
-        printf("Failed to open file\n");
+    printf("Thread READ: Starting read on device...\n");
+    ret = read(fd, buffer, sizeof(buffer));
+    if (ret < 0) {
+        perror("read");
+    } else {
+        printf("Thread READ: Read %zd bytes\n", ret);
     }
 
-    printf("Doing work\n");
-    pause();// thread 1 will block
-    printf("Done work\n");
-
-    printf("Closing fd in thread: %d\n", *(int *)arg);
-    close(fd);
-    printf("Closed fd in thread: %d\n", *(int *)arg);
-}
-
-
-void *ioctl_func(void *arg) {
-
-    printf("Starting open in %d thread\n", *(int *)arg);
-    int fd = open(DEV_PATH, O_RDWR);
-    printf("Finished open in %d thread\n", *(int *)arg);
-
-    if (fd == -1) {
-
-        printf("Failed to open file\n");
-    }
-
-    printf("IOCTL switching started\n");
-    int ioctl_err = ioctl(fd, E2_IOCMODE2);
-
-    if (ioctl_err == -1) {
-
-        printf("Failed to switch mode\n");
-    }
-    printf("IOCTL mode 2 switching ended\n");
-
-    pause();// simulate work
-    
-    printf("Closing fd in thread: %d\n", *(int *)arg);
-    close(fd);
-    printf("Closed fd in thread: %d\n", *(int *)arg);
     return NULL;
 }
 
-int main(int argc, char *argv[]) {
+void *ioctl_thread_func(void *arg) {
+    int fd = *((int*)arg);
 
-    pthread_t threads[2];
+    sleep(1);
+    printf("Thread IOCTL: Calling ioctl to switch mode...\n");
 
-    int t1 = 1;
-    int t2 = 2;
+    int ret = ioctl(fd, E2_IOCMODE1);
+    if (ret < 0) {
+        perror("ioctl");
+    } else {
+        printf("Thread IOCTL: ioctl completed\n");
+    }
+    return NULL;
+}
+
+int main() {
+    int fd_read, fd_ioctl;
+    pthread_t tid_read, tid_ioctl;
+
+    fd_read = open(DEV_FILE, O_RDONLY);
+    if (fd_read < 0) {
+        perror("open for read");
+        exit(EXIT_FAILURE);
+    }
     
-    pthread_create(&threads[0], NULL, open_func, &t1);
-    pthread_create(&threads[1], NULL, open_func, &t2);
+    fd_ioctl = open(DEV_FILE, O_RDONLY);
+    if (fd_ioctl < 0) {
+        perror("open for ioctl");
+        close(fd_read);
+        exit(EXIT_FAILURE);
+    }
+    
+    printf("Main: Device opened; launching threads...\n");
 
-    pthread_join(threads[0], NULL);
-    printf("Joined thread 1\n");
-    pthread_join(threads[1], NULL);
-    printf("Joined thread 2\n");
+    if (pthread_create(&tid_read, NULL, read_thread_func, &fd_read) != 0) {
+        perror("pthread_create for read thread");
+        close(fd_read);
+        close(fd_ioctl);
+        exit(EXIT_FAILURE);
+    }
 
-    printf("Exited program\n");
+    if (pthread_create(&tid_ioctl, NULL, ioctl_thread_func, &fd_ioctl) != 0) {
+        perror("pthread_create for ioctl thread");
+        close(fd_read);
+        close(fd_ioctl);
+        exit(EXIT_FAILURE);
+    }
+
+    pthread_join(tid_read, NULL);
+    pthread_join(tid_ioctl, NULL);
+
+    printf("Main: Threads completed. If this message prints, the expected deadlock did not occur.\n");
+
+    close(fd_read);
+    close(fd_ioctl);
     return 0;
 }
+

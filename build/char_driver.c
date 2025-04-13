@@ -63,8 +63,9 @@ int e2_release(struct inode *inode, struct file *filp)
     down_interruptible(&devc->sem1);
     if (devc->mode == MODE1) {
         devc->count1--;
-        if (devc->count1 == 1)
+        if (devc->count1 == 1) {
             wake_up_interruptible(&(devc->queue1));
+        }
 	up(&devc->sem2);
     }
     else if (devc->mode == MODE2) {
@@ -96,6 +97,7 @@ static ssize_t e2_read (struct file *filp, char __user *buf, size_t count, loff_
           up(&devc->sem1);
           return ret;
        }
+       msleep(5000);
        ret = count - copy_to_user(buf, devc->ramdisk, count);
        *f_pos += ret;
        up(&devc->sem1);

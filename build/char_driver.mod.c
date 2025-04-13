@@ -51,6 +51,12 @@ __used __section("__versions") =
 	"_printk\0"
 	"\x1c\x00\x00\x00\xcb\xf6\xfd\xf0"
 	"__stack_chk_fail\0\0\0\0"
+	"\x10\x00\x00\x00\xf9\x82\xa4\xf9"
+	"msleep\0\0"
+	"\x1c\x00\x00\x00\x48\x9f\xdb\x88"
+	"__check_object_size\0"
+	"\x18\x00\x00\x00\xe1\xbe\x10\x6b"
+	"_copy_to_user\0\0\0"
 	"\x20\x00\x00\x00\x3b\x8f\xd7\x3f"
 	"register_chrdev_region\0\0"
 	"\x18\x00\x00\x00\x4f\x1e\x1f\x59"
@@ -83,12 +89,8 @@ __used __section("__versions") =
 	"unregister_chrdev_region\0\0\0\0"
 	"\x10\x00\x00\x00\xba\x0c\x7a\x03"
 	"kfree\0\0\0"
-	"\x1c\x00\x00\x00\x48\x9f\xdb\x88"
-	"__check_object_size\0"
 	"\x18\x00\x00\x00\xc2\x9c\xc4\x13"
 	"_copy_from_user\0"
-	"\x18\x00\x00\x00\xe1\xbe\x10\x6b"
-	"_copy_to_user\0\0\0"
 	"\x14\x00\x00\x00\xbb\x6d\xfb\xbd"
 	"__fentry__\0\0"
 	"\x1c\x00\x00\x00\x73\xe5\xd0\x6b"
@@ -104,4 +106,4 @@ __used __section("__versions") =
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "15E58502E0F22DD48CD6423");
+MODULE_INFO(srcversion, "772592011C051F159D3BB8C");
